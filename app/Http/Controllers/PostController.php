@@ -8,22 +8,20 @@ use App\Models\Post;
 
 class PostController extends Controller
 {
-    //
+    // get all posts
     public function index()
     {
         return response([
-            'posts' => Post::orderBy('created_at', 'desc')
-                ->with('user:id,name,image')
-                ->withCount('comments', 'likes')
-                ->with('likes', function($like){
-                    return $like->where('user_id', auth()->user()->id)
-                        ->select('id', 'user_id', 'post_id')
-                        ->get();
-                })
-                ->get()
+            'posts' => Post::orderBy('created_at', 'desc')->with('user:id,name,image')->withCount('comments', 'likes')
+            ->with('likes', function($like){
+                return $like->where('user_id', auth()->user()->id)
+                    ->select('id', 'user_id', 'post_id')->get();
+            })
+            ->get()
         ], 200);
     }
 
+    // get single post
     public function show($id)
     {
         return response([
@@ -31,6 +29,7 @@ class PostController extends Controller
         ], 200);
     }
 
+    // create a post
     public function store(Request $request)
     {
         //validate fields
@@ -46,14 +45,15 @@ class PostController extends Controller
             'image' => $image
         ]);
 
-        // for now let's skip image post
+        // for now skip for post image
 
         return response([
-            'message' => 'Post created',
-            'post' => $post
+            'message' => 'Post created.',
+            'post' => $post,
         ], 200);
     }
 
+    // update a post
     public function update(Request $request, $id)
     {
         $post = Post::find($id);
@@ -61,34 +61,35 @@ class PostController extends Controller
         if(!$post)
         {
             return response([
-                'message' => 'Post not found'
+                'message' => 'Post not found.'
             ], 403);
         }
 
         if($post->user_id != auth()->user()->id)
         {
             return response([
-                'message' => 'Permission denied'
-            ]);
+                'message' => 'Permission denied.'
+            ], 403);
         }
-        
+
         //validate fields
         $attrs = $request->validate([
             'body' => 'required|string'
         ]);
 
         $post->update([
-            'body' => $attrs['body'],
+            'body' =>  $attrs['body']
         ]);
 
-        // for now let's skip image post
+        // for now skip for post image
 
         return response([
-            'message' => 'Post created',
+            'message' => 'Post updated.',
             'post' => $post
         ], 200);
     }
 
+    //delete post
     public function destroy($id)
     {
         $post = Post::find($id);
@@ -96,15 +97,15 @@ class PostController extends Controller
         if(!$post)
         {
             return response([
-                'message' => 'Post not found'
+                'message' => 'Post not found.'
             ], 403);
         }
 
         if($post->user_id != auth()->user()->id)
         {
             return response([
-                'message' => 'Permission denied'
-            ]);
+                'message' => 'Permission denied.'
+            ], 403);
         }
 
         $post->comments()->delete();
@@ -112,7 +113,7 @@ class PostController extends Controller
         $post->delete();
 
         return response([
-            'message' => 'Post deleted.',
+            'message' => 'Post deleted.'
         ], 200);
     }
 }

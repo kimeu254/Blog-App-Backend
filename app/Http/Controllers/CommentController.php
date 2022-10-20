@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Comment;
 use App\Models\Post;
+use App\Models\Comment;
 
 class CommentController extends Controller
 {
-    //
+    // get all comments of a post
     public function index($id)
     {
         $post = Post::find($id);
@@ -16,7 +16,7 @@ class CommentController extends Controller
         if(!$post)
         {
             return response([
-                'message' => 'Post not found'
+                'message' => 'Post not found.'
             ], 403);
         }
 
@@ -25,19 +25,20 @@ class CommentController extends Controller
         ], 200);
     }
 
-    public function store(Request $request,$id)
+    // create a comment
+    public function store(Request $request, $id)
     {
         $post = Post::find($id);
 
         if(!$post)
         {
             return response([
-                'message' => 'Post not found'
+                'message' => 'Post not found.'
             ], 403);
         }
 
-         //validate fields
-         $attrs = $request->validate([
+        //validate fields
+        $attrs = $request->validate([
             'comment' => 'required|string'
         ]);
 
@@ -52,6 +53,7 @@ class CommentController extends Controller
         ], 200);
     }
 
+    // update a comment
     public function update(Request $request, $id)
     {
         $comment = Comment::find($id);
@@ -59,19 +61,19 @@ class CommentController extends Controller
         if(!$comment)
         {
             return response([
-                'message' => 'Comment not found'
+                'message' => 'Comment not found.'
             ], 403);
         }
 
         if($comment->user_id != auth()->user()->id)
         {
             return response([
-                'message' => 'Permission denied'
-            ]);
+                'message' => 'Permission denied.'
+            ], 403);
         }
 
-         //validate fields
-         $attrs = $request->validate([
+        //validate fields
+        $attrs = $request->validate([
             'comment' => 'required|string'
         ]);
 
@@ -84,6 +86,7 @@ class CommentController extends Controller
         ], 200);
     }
 
+    // delete a comment
     public function destroy($id)
     {
         $comment = Comment::find($id);
@@ -91,17 +94,17 @@ class CommentController extends Controller
         if(!$comment)
         {
             return response([
-                'message' => 'Comment not found'
+                'message' => 'Comment not found.'
             ], 403);
         }
 
         if($comment->user_id != auth()->user()->id)
         {
             return response([
-                'message' => 'Permission denied'
-            ]);
+                'message' => 'Permission denied.'
+            ], 403);
         }
-        
+
         $comment->delete();
 
         return response([
